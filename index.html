@@ -96,12 +96,11 @@
     .input-field {
       display: flex;
       align-items: center;
-      background: #f4f9fd;
+      background: white;
       border: 1.5px solid #d1e2f0;
       border-radius: 14px;
       padding: 0.1rem 0.1rem 0.1rem 1.2rem;
       transition: all 0.2s;
-      background: white;
     }
 
     .input-field:focus-within {
@@ -109,7 +108,7 @@
       box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
     }
 
-    .input-field input, .input-field select {
+    .input-field input {
       width: 100%;
       border: none;
       padding: 0.9rem 0.2rem 0.9rem 0;
@@ -124,12 +123,65 @@
       color: #2c7da0;
       font-weight: 700;
       font-size: 0.9rem;
-      padding-right: 1rem;
+      padding: 0.4rem 1rem;
       background: #e6f2f9;
       margin: 0.25rem;
       border-radius: 10px;
-      padding: 0.4rem 1rem;
       white-space: nowrap;
+    }
+
+    /* Contenedor del select personalizado */
+    .select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-right: 0.25rem;
+    }
+
+    .unit-select {
+      background: #e6f2f9;
+      border: none;
+      color: #0b3b5c;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.5rem 2rem 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      letter-spacing: 0.3px;
+      transition: all 0.2s ease;
+      width: auto;
+      min-width: 120px;
+    }
+
+    .unit-select:hover {
+      background-color: #d0e6f7;
+      box-shadow: 0 2px 6px rgba(30, 111, 156, 0.15);
+      color: #0a3147;
+    }
+
+    .unit-select:focus {
+      background-color: #cbe3f5;
+      box-shadow: 0 0 0 2px rgba(44,125,160,0.3);
+    }
+
+    /* Flecha personalizada con pseudo-elemento */
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #1e6f9c;
+      pointer-events: none;
     }
 
     .double-row {
@@ -262,6 +314,29 @@
       margin-top: 0.3rem;
       display: none;
     }
+    
+        .disclaimer {
+      margin-top: 2rem;
+      padding: 1rem 1.2rem;
+      background: #fff9e6;
+      border-left: 4px solid #e6b422;
+      border-radius: 14px;
+      font-size: 0.8rem;
+      color: #5a4a2e;
+      line-height: 1.5;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .disclaimer strong {
+      color: #b45f2a;
+      font-weight: 700;
+    }
+
+    .disclaimer .icon {
+      font-size: 1.2rem;
+      margin-right: 0.2rem;
+    }
   </style>
 </head>
 <body>
@@ -314,10 +389,15 @@
           </div>
         </div>
         <div class="input-group">
-          <label>⚡ Dosis (µg/kg/min)</label>
+          <label>⚡ Dosis</label>
           <div class="input-field">
             <input type="number" id="dosis" step="0.1" min="0.1" placeholder="20" value="20">
-            <span class="unit">µg/kg/min</span>
+            <div class="select-wrapper">
+              <select class="unit-select" id="unidadDosis">
+                <option value="mcg" selected>µg/kg/min</option>
+                <option value="mg">mg/kg/min</option>
+              </select>
+            </div>
           </div>
           <div class="quick-btns" id="dosisRapida">
             <button class="quick-btn" data-dose="0.5">0.5</button>
@@ -372,12 +452,16 @@
         💡 <span>Retira ese volumen del suero si es necesario para mantener el volumen total indicado, o añádelo directamente si el volumen extra es aceptable.</span>
       </div>
     </div>
+    <div class="disclaimer">
+      <span class="icon">⚠️</span> <strong>Aviso importante:</strong> Esta calculadora es una herramienta de apoyo. Las dosis deben ser revisadas y validadas por un profesional veterinario. El creador no se hace responsable de posibles errores, omisiones o del uso clínico de los resultados obtenidos.
+    </div>
   </div>
 
   <script>
     // Elementos DOM
     const pesoInput = document.getElementById('peso');
     const dosisInput = document.getElementById('dosis');
+    const unidadDosisSelect = document.getElementById('unidadDosis');
     const volBolsaInput = document.getElementById('volBolsa');
     const duracionInput = document.getElementById('duracion');
     const concentracionInput = document.getElementById('concentracion');
@@ -432,7 +516,8 @@
       ocultarError();
       
       const peso = parseFloat(pesoInput.value);
-      const dosis = parseFloat(dosisInput.value); // µg/kg/min
+      let dosis = parseFloat(dosisInput.value);
+      const unidad = unidadDosisSelect.value;
       const volBolsa = parseFloat(volBolsaInput.value);
       const duracion = parseFloat(duracionInput.value);
       const concentracion = parseFloat(concentracionInput.value);
@@ -446,10 +531,14 @@
         return;
       }
 
-      // Convertir dosis a mg/kg/min
-      const dosisMgKgMin = dosis / 1000;
-      const velocidadInfusion = volBolsa / duracion; // ml/h
+      let dosisMgKgMin;
+      if (unidad === 'mcg') {
+        dosisMgKgMin = dosis / 1000;
+      } else {
+        dosisMgKgMin = dosis;
+      }
 
+      const velocidadInfusion = volBolsa / duracion;
       const numerador = dosisMgKgMin * peso * 60 * volBolsa;
       const denominador = velocidadInfusion * concentracion;
       
@@ -463,19 +552,18 @@
       volAnadirSpan.textContent = volAnadir.toFixed(2) + ' ml';
       velocidadInfSpan.textContent = velocidadInfusion.toFixed(1) + ' ml/h';
 
-      const resumen = `Añadir ${volAnadir.toFixed(2)} ml del fármaco (${concentracion} mg/ml) a una bolsa de ${volBolsa} ml. Administrar a ${velocidadInfusion.toFixed(1)} ml/h durante ${duracion} h para entregar ${dosis} µg/kg/min.`;
+      const unidadMostrada = unidad === 'mcg' ? 'µg/kg/min' : 'mg/kg/min';
+      const resumen = `Añadir ${volAnadir.toFixed(2)} ml del fármaco (${concentracion} mg/ml) a una bolsa de ${volBolsa} ml. Administrar a ${velocidadInfusion.toFixed(1)} ml/h durante ${duracion} h para entregar ${dosis} ${unidadMostrada}.`;
       resumenTexto.textContent = resumen;
 
       resultadoCard.classList.add('show');
       
-      // Actualizar botones activos según valores actuales
       actualizarBotonesActivos('volumen', volBolsa.toString());
       actualizarBotonesActivos('duracion', duracion.toString());
       actualizarBotonesActivos('dosis', dosis.toString());
       actualizarBotonesActivos('concentracion', concentracion.toString());
     }
 
-    // Event listeners para botones rápidos
     volumenBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         volBolsaInput.value = btn.getAttribute('data-volume');
@@ -504,9 +592,12 @@
       });
     });
 
+    unidadDosisSelect.addEventListener('change', () => {
+      calcularCRI();
+    });
+
     calcularBtn.addEventListener('click', calcularCRI);
 
-    // Calcular con Enter
     const inputs = [pesoInput, dosisInput, volBolsaInput, duracionInput, concentracionInput];
     inputs.forEach(input => {
       input.addEventListener('keypress', (e) => {
@@ -524,7 +615,6 @@
       });
     });
 
-    // Cálculo inicial
     window.addEventListener('DOMContentLoaded', () => {
       calcularCRI();
     });
