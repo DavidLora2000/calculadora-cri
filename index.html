@@ -291,8 +291,9 @@
             <span class="unit">h</span>
           </div>
           <div class="quick-btns" id="duracionRapida">
-            <button class="quick-btn" data-duration="2">2 h</button>
-            <button class="quick-btn" data-duration="4">4 h</button>
+            <button class="quick-btn" data-duration="8">8 h</button>
+            <button class="quick-btn active" data-duration="12">12 h</button>
+            <button class="quick-btn" data-duration="24">24 h</button>
           </div>
         </div>
       </div>
@@ -318,15 +319,27 @@
             <input type="number" id="dosis" step="0.1" min="0.1" placeholder="20" value="20">
             <span class="unit">µg/kg/min</span>
           </div>
+          <div class="quick-btns" id="dosisRapida">
+            <button class="quick-btn" data-dose="0.5">0.5</button>
+            <button class="quick-btn active" data-dose="20">20</button>
+            <button class="quick-btn" data-dose="30">30</button>
+            <button class="quick-btn" data-dose="40">40</button>
+          </div>
         </div>
       </div>
 
-      <!-- Concentración (tercera fila, campo completo) -->
+      <!-- Concentración (tercera fila) -->
       <div class="input-group">
         <label>💊 Concentración del fármaco (mg/ml)</label>
         <div class="input-field">
           <input type="number" id="concentracion" step="0.1" min="0.1" placeholder="20" value="20">
           <span class="unit">mg/ml</span>
+        </div>
+        <div class="quick-btns" id="concentracionRapida">
+          <button class="quick-btn" data-concentracion="0.5">0.5 mg/ml</button>
+          <button class="quick-btn" data-concentracion="10">10 mg/ml</button>
+          <button class="quick-btn active" data-concentracion="20">20 mg/ml</button>
+          <button class="quick-btn" data-concentracion="50">50 mg/ml</button>
         </div>
         <div style="font-size:0.8rem; color:#3a5b6e; margin-top:0.2rem;">
           Ej: Lidocaína 2% = 20 mg/ml | 1% = 10 mg/ml | 5% = 50 mg/ml
@@ -378,6 +391,8 @@
     // Botones rápidos
     const volumenBtns = document.querySelectorAll('#volumenRapido .quick-btn');
     const duracionBtns = document.querySelectorAll('#duracionRapida .quick-btn');
+    const dosisBtns = document.querySelectorAll('#dosisRapida .quick-btn');
+    const concentracionBtns = document.querySelectorAll('#concentracionRapida .quick-btn');
 
     function mostrarError(mensaje) {
       errorMsg.textContent = mensaje;
@@ -399,6 +414,16 @@
         duracionBtns.forEach(btn => {
           const dur = btn.getAttribute('data-duration');
           btn.classList.toggle('active', dur === valor);
+        });
+      } else if (tipo === 'dosis') {
+        dosisBtns.forEach(btn => {
+          const dos = btn.getAttribute('data-dose');
+          btn.classList.toggle('active', dos === valor);
+        });
+      } else if (tipo === 'concentracion') {
+        concentracionBtns.forEach(btn => {
+          const con = btn.getAttribute('data-concentracion');
+          btn.classList.toggle('active', con === valor);
         });
       }
     }
@@ -446,22 +471,35 @@
       // Actualizar botones activos según valores actuales
       actualizarBotonesActivos('volumen', volBolsa.toString());
       actualizarBotonesActivos('duracion', duracion.toString());
+      actualizarBotonesActivos('dosis', dosis.toString());
+      actualizarBotonesActivos('concentracion', concentracion.toString());
     }
 
-    // Event listeners para botones rápidos de volumen
+    // Event listeners para botones rápidos
     volumenBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const vol = btn.getAttribute('data-volume');
-        volBolsaInput.value = vol;
+        volBolsaInput.value = btn.getAttribute('data-volume');
         calcularCRI();
       });
     });
 
-    // Event listeners para botones rápidos de duración
     duracionBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const dur = btn.getAttribute('data-duration');
-        duracionInput.value = dur;
+        duracionInput.value = btn.getAttribute('data-duration');
+        calcularCRI();
+      });
+    });
+
+    dosisBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dosisInput.value = btn.getAttribute('data-dose');
+        calcularCRI();
+      });
+    });
+
+    concentracionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        concentracionInput.value = btn.getAttribute('data-concentracion');
         calcularCRI();
       });
     });
@@ -481,6 +519,8 @@
         const val = input.value;
         if (input === volBolsaInput) actualizarBotonesActivos('volumen', val);
         if (input === duracionInput) actualizarBotonesActivos('duracion', val);
+        if (input === dosisInput) actualizarBotonesActivos('dosis', val);
+        if (input === concentracionInput) actualizarBotonesActivos('concentracion', val);
       });
     });
 
