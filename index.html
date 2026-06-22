@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Calculadora CRI Veterinaria | Dosis a añadir al suero</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e9f2f7 0%, #dceefb 100%);
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      margin: 0;
+    }
+
+    .card {
+      max-width: 650px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px rgba(0,20,40,0.15);
+      padding: 2rem 2rem 2.5rem;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(70, 130, 180, 0.15);
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #0b3b5c;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    h1 span {
+      background: #1e6f9c;
+      color: white;
+      font-size: 1.2rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 2rem;
+      margin-left: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #4a6579;
+      margin-bottom: 1.8rem;
+      border-left: 4px solid #2c7da0;
+      padding-left: 1rem;
+      font-weight: 400;
+      background: #f0f7fc;
+      border-radius: 0 8px 8px 0;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1e445c;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      letter-spacing: 0.01em;
+    }
+
+    label i {
+      font-style: normal;
+      font-size: 1.1rem;
+    }
+
+    .input-field {
+      display: flex;
+      align-items: center;
+      background: #f4f9fd;
+      border: 1.5px solid #d1e2f0;
+      border-radius: 14px;
+      padding: 0.1rem 0.1rem 0.1rem 1.2rem;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .input-field:focus-within {
+      border-color: #2c7da0;
+      box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+    }
+
+    .input-field input, .input-field select {
+      width: 100%;
+      border: none;
+      padding: 0.9rem 0.2rem 0.9rem 0;
+      font-size: 1rem;
+      background: transparent;
+      outline: none;
+      color: #0b2b3b;
+      font-weight: 500;
+    }
+
+    .input-field .unit {
+      color: #2c7da0;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding-right: 1rem;
+      background: #e6f2f9;
+      margin: 0.25rem;
+      border-radius: 10px;
+      padding: 0.4rem 1rem;
+      white-space: nowrap;
+    }
+
+    .double-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .double-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+    }
+
+    .quick-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .quick-btn {
+      background: white;
+      border: 1px solid #caddf0;
+      color: #0b3b5c;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #f4faff;
+    }
+
+    .quick-btn:hover {
+      background: #dceefb;
+      border-color: #2c7da0;
+      color: #0a3147;
+    }
+
+    .quick-btn.active {
+      background: #1e6f9c;
+      color: white;
+      border-color: #1e6f9c;
+      box-shadow: 0 4px 10px rgba(0,80,120,0.2);
+    }
+
+    .button {
+      background: linear-gradient(145deg, #0f4b6e, #0a3147);
+      color: white;
+      border: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.9rem 1.8rem;
+      border-radius: 2.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 1.2rem;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      box-shadow: 0 8px 18px rgba(10, 60, 90, 0.25);
+    }
+
+    .button:hover {
+      background: #0c5b82;
+      box-shadow: 0 12px 22px rgba(8, 70, 110, 0.3);
+      transform: scale(1.01);
+    }
+
+    .result-card {
+      margin-top: 2rem;
+      background: #e9f4fa;
+      border-radius: 20px;
+      padding: 1.4rem;
+      display: none;
+      border: 1px solid #b8d8f0;
+      transition: 0.3s;
+    }
+
+    .result-card.show {
+      display: block;
+    }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 1.2rem;
+      margin-bottom: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .result-value {
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: #003f5c;
+      background: white;
+      padding: 0.3rem 1.2rem;
+      border-radius: 2rem;
+    }
+
+    .small-note {
+      color: #2c4b5e;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      background: white;
+      border-radius: 12px;
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    hr {
+      border: 0.5px solid #caddf0;
+      margin: 1.2rem 0 0.8rem;
+    }
+
+    .error-message {
+      color: #b13b3b;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>
+      💉 Calculadora CRI
+      <span>Vet</span>
+    </h1>
+    <div class="subtitle">
+      Calcula cuántos mililitros de fármaco agregar al suero para una infusión continua
+    </div>
+
+    <div class="form-grid">
+      <!-- Peso y Duración (primera fila) -->
+      <div class="double-row">
+        <div class="input-group">
+          <label>🐕 Peso del paciente (kg)</label>
+          <div class="input-field">
+            <input type="number" id="peso" step="0.1" min="0.1" placeholder="12" value="12">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>⏱️ Duración de la CRI (horas)</label>
+          <div class="input-field">
+            <input type="number" id="duracion" step="0.5" min="0.5" placeholder="12" value="12">
+            <span class="unit">h</span>
+          </div>
+          <div class="quick-btns" id="duracionRapida">
+            <button class="quick-btn" data-duration="2">2 h</button>
+            <button class="quick-btn" data-duration="4">4 h</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volumen de la bolsa y Dosis (segunda fila) -->
+      <div class="double-row">
+        <div class="input-group">
+          <label>🧴 Volumen de la bolsa (ml)</label>
+          <div class="input-field">
+            <input type="number" id="volBolsa" step="1" min="1" placeholder="250" value="250">
+            <span class="unit">ml</span>
+          </div>
+          <div class="quick-btns" id="volumenRapido">
+            <button class="quick-btn" data-volume="50">50 ml</button>
+            <button class="quick-btn" data-volume="100">100 ml</button>
+            <button class="quick-btn active" data-volume="250">250 ml</button>
+            <button class="quick-btn" data-volume="500">500 ml</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>⚡ Dosis (µg/kg/min)</label>
+          <div class="input-field">
+            <input type="number" id="dosis" step="0.1" min="0.1" placeholder="20" value="20">
+            <span class="unit">µg/kg/min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Concentración (tercera fila, campo completo) -->
+      <div class="input-group">
+        <label>💊 Concentración del fármaco (mg/ml)</label>
+        <div class="input-field">
+          <input type="number" id="concentracion" step="0.1" min="0.1" placeholder="20" value="20">
+          <span class="unit">mg/ml</span>
+        </div>
+        <div style="font-size:0.8rem; color:#3a5b6e; margin-top:0.2rem;">
+          Ej: Lidocaína 2% = 20 mg/ml | 1% = 10 mg/ml | 5% = 50 mg/ml
+        </div>
+      </div>
+
+      <button class="button" id="calcularBtn">
+        🔍 Calcular volumen a añadir
+      </button>
+      <div class="error-message" id="errorMsg"></div>
+    </div>
+
+    <div class="result-card" id="resultadoCard">
+      <div style="font-weight:700; color:#0b3b5c; margin-bottom:0.8rem; font-size:1.1rem;">
+        ✅ Resultado de la preparación
+      </div>
+      <div class="result-line">
+        <span>💧 Volumen de fármaco a añadir:</span>
+        <span class="result-value" id="volAnadir">0 ml</span>
+      </div>
+      <div class="result-line">
+        <span>⏲️ Velocidad de infusión:</span>
+        <span class="result-value" id="velocidadInf">0 ml/h</span>
+      </div>
+      <hr>
+      <div class="small-note">
+        📋 <span id="resumenTexto"></span>
+      </div>
+      <div class="small-note" style="margin-top:0.5rem; background:#fff8e7;">
+        💡 <span>Retira ese volumen del suero si es necesario para mantener el volumen total indicado, o añádelo directamente si el volumen extra es aceptable.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elementos DOM
+    const pesoInput = document.getElementById('peso');
+    const dosisInput = document.getElementById('dosis');
+    const volBolsaInput = document.getElementById('volBolsa');
+    const duracionInput = document.getElementById('duracion');
+    const concentracionInput = document.getElementById('concentracion');
+    const calcularBtn = document.getElementById('calcularBtn');
+    const resultadoCard = document.getElementById('resultadoCard');
+    const volAnadirSpan = document.getElementById('volAnadir');
+    const velocidadInfSpan = document.getElementById('velocidadInf');
+    const resumenTexto = document.getElementById('resumenTexto');
+    const errorMsg = document.getElementById('errorMsg');
+
+    // Botones rápidos
+    const volumenBtns = document.querySelectorAll('#volumenRapido .quick-btn');
+    const duracionBtns = document.querySelectorAll('#duracionRapida .quick-btn');
+
+    function mostrarError(mensaje) {
+      errorMsg.textContent = mensaje;
+      errorMsg.style.display = 'block';
+      resultadoCard.classList.remove('show');
+    }
+
+    function ocultarError() {
+      errorMsg.style.display = 'none';
+    }
+
+    function actualizarBotonesActivos(tipo, valor) {
+      if (tipo === 'volumen') {
+        volumenBtns.forEach(btn => {
+          const vol = btn.getAttribute('data-volume');
+          btn.classList.toggle('active', vol === valor);
+        });
+      } else if (tipo === 'duracion') {
+        duracionBtns.forEach(btn => {
+          const dur = btn.getAttribute('data-duration');
+          btn.classList.toggle('active', dur === valor);
+        });
+      }
+    }
+
+    function calcularCRI() {
+      ocultarError();
+      
+      const peso = parseFloat(pesoInput.value);
+      const dosis = parseFloat(dosisInput.value); // µg/kg/min
+      const volBolsa = parseFloat(volBolsaInput.value);
+      const duracion = parseFloat(duracionInput.value);
+      const concentracion = parseFloat(concentracionInput.value);
+
+      if (isNaN(peso) || isNaN(dosis) || isNaN(volBolsa) || isNaN(duracion) || isNaN(concentracion)) {
+        mostrarError('⚠️ Por favor completa todos los campos con números válidos.');
+        return;
+      }
+      if (peso <= 0 || dosis <= 0 || volBolsa <= 0 || duracion <= 0 || concentracion <= 0) {
+        mostrarError('⚠️ Todos los valores deben ser mayores que cero.');
+        return;
+      }
+
+      // Convertir dosis a mg/kg/min
+      const dosisMgKgMin = dosis / 1000;
+      const velocidadInfusion = volBolsa / duracion; // ml/h
+
+      const numerador = dosisMgKgMin * peso * 60 * volBolsa;
+      const denominador = velocidadInfusion * concentracion;
+      
+      if (denominador === 0) {
+        mostrarError('⚠️ La velocidad de infusión o concentración no pueden ser cero.');
+        return;
+      }
+
+      const volAnadir = numerador / denominador;
+
+      volAnadirSpan.textContent = volAnadir.toFixed(2) + ' ml';
+      velocidadInfSpan.textContent = velocidadInfusion.toFixed(1) + ' ml/h';
+
+      const resumen = `Añadir ${volAnadir.toFixed(2)} ml del fármaco (${concentracion} mg/ml) a una bolsa de ${volBolsa} ml. Administrar a ${velocidadInfusion.toFixed(1)} ml/h durante ${duracion} h para entregar ${dosis} µg/kg/min.`;
+      resumenTexto.textContent = resumen;
+
+      resultadoCard.classList.add('show');
+      
+      // Actualizar botones activos según valores actuales
+      actualizarBotonesActivos('volumen', volBolsa.toString());
+      actualizarBotonesActivos('duracion', duracion.toString());
+    }
+
+    // Event listeners para botones rápidos de volumen
+    volumenBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const vol = btn.getAttribute('data-volume');
+        volBolsaInput.value = vol;
+        calcularCRI();
+      });
+    });
+
+    // Event listeners para botones rápidos de duración
+    duracionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dur = btn.getAttribute('data-duration');
+        duracionInput.value = dur;
+        calcularCRI();
+      });
+    });
+
+    calcularBtn.addEventListener('click', calcularCRI);
+
+    // Calcular con Enter
+    const inputs = [pesoInput, dosisInput, volBolsaInput, duracionInput, concentracionInput];
+    inputs.forEach(input => {
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          calcularCRI();
+        }
+      });
+      input.addEventListener('input', () => {
+        const val = input.value;
+        if (input === volBolsaInput) actualizarBotonesActivos('volumen', val);
+        if (input === duracionInput) actualizarBotonesActivos('duracion', val);
+      });
+    });
+
+    // Cálculo inicial
+    window.addEventListener('DOMContentLoaded', () => {
+      calcularCRI();
+    });
+  </script>
+</body>
+</html>
